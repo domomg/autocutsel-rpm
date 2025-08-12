@@ -1,0 +1,55 @@
+name: Build and Release RPM
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # full git history or will fail later
+
+    - name: Install RPM build tools
+      run: |
+        dnf update -y
+        dnf install -y rpmdevtools rpmbuild gcc make libXtst-devel libXaw-devel xorg-x11-server-devel git
+
+    - name: Configure git dir
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+
+    - name: Prepare source
+      run: |
+        mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+        cp $GITHUB_WORKSPACE/autocutsel-0.10.1.tar.gz ~/rpmbuild/SOURCES/
+        cp $GITHUB_WORKSPACE/specs/autocutsel.spec ~/rpmbuild/SPECS/
+
+    - name: Build RPM
+      run: |
+        rpmbuild -ba ~/rpmbuild/SPECS/autocutsel.spec
+
+    - name: Install GitHub CLI
+      run: |
+        dnf install -y curl
+        GH_CLI_LATEST=$(curl -s https://api.github.com/repos/cli/cli/releases/latest | grep browser_download_url | grep linux_amd64.rpm | cut -d '"' -f 4)
+        curl -LO $GH_CLI_LATEST
+        rpm -i $(basename $GH_CLI_LATEST)
+
+    - name: Authenticate GitHub CLI
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+
+    - name: Create GitHub Release
+      run: |
+        cd $GITHUB_WORKSPACE
+        gh release create v0.10.1 $HOME/rpmbuild/RPMS/x86_64/autocutsel-0.10.1-1.fc42.x86_64.rpm --title "Release v0.10.1" --notes "Initial release." --repo ${{ github.repository }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
