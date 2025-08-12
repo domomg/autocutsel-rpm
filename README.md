@@ -17,7 +17,7 @@ This repository provides a simple solution for Fedora users to build and obtain 
 
 ## Usage
 
-To download and install the RPM package, visit the [Releases](https://github.com/domomg/autocutsel-rpm/releases) page of this repository. Follow these steps to install the package:
+To download and install the RPM package, visit the [Releases](https://github.com/domomg/autocutsel-rpm/releases/tag/v0.10.1) page of this repository. Follow these steps to install the package:
 
 1. Download the RPM from the latest release.
 2. Install the RPM using the following command:
