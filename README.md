@@ -1,5 +1,7 @@
 # Autocutsel RPM Package
 
+[![Build and Release RPM](https://github.com/domomg/autocutsel-rpm/actions/workflows/build-rpm.yml/badge.svg)](https://github.com/domomg/autocutsel-rpm/actions/workflows/build-rpm.yml)
+
 This repository automates the compilation and packaging of Autocutsel into an RPM for Fedora, which currently does not include Autocutsel in its repositories.
 
 ## About Autocutsel
